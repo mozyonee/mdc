@@ -1,0 +1,78 @@
+form {
+	display: flex;
+	gap: 10px;
+	margin-bottom: 10px;
+}
+
+form input, form button, form select, form option {
+	border: 1px solid #303030;
+	padding: 10px;
+}
+
+.result {
+	margin-top: 30px;
+	display: flex;
+	justify-content: space-between;
+}
+
+.profile {
+	display: flex;
+	gap: 20px;
+}
+
+.profile ul {
+	list-style-type: none;
+	height: min-content;
+}
+
+
+
+
+
+
+
+.police table {
+	border-collapse: collapse;
+	width: 100%;
+	margin-bottom: 15px;
+}
+.police table caption {
+	margin-bottom: 5px;
+}
+.police table th, td {
+	border: 1px solid #303030;
+	padding: 10px;
+	text-align: center;
+}
+.police p {
+	text-align: center;
+}
+
+.police form input {
+	width: 40%;
+}
+
+.police form button {
+	width: 20%;
+}
+
+
+.record {
+	margin-top: 10px;
+}
+
+tr td:last-child {
+	padding: 0!important;
+}
+
+.police table form {
+	margin: 0;
+	display: flex;
+}
+.police table button {
+	height: 43px;
+	width: 100%;
+	border: none;
+	background: transparent;
+	font-weight: 900;
+}

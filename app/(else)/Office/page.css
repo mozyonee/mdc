@@ -1,0 +1,36 @@
+.office {
+	display: flex;
+	height: 100%;
+}
+.sideBar {
+	text-align: center;
+	padding-right: 20px;
+	height: 100%;
+	border-right: 1px solid black;
+}
+
+.profile {
+	margin-left: 20px;
+	display: flex;
+	gap: 20px;
+}
+
+hr {
+	margin: 15px auto 10px auto;
+}
+
+.statistics {
+	height: min-content;
+}
+
+.calls {
+	margin-left: 20px;
+}
+
+table, th, td {
+	border-collapse: collapse;
+	border: 1px solid;
+	max-height: min-content;
+	padding: 5px;
+}
+  

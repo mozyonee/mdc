@@ -1,0 +1,37 @@
+footer {
+	background: #303030;
+	display: flex;
+	align-items: center;
+	color: #fff;
+}
+
+footer nav {
+	width: 100%;
+	padding: 0 15px;
+	display: flex;
+	text-align: center;
+	align-items: center;
+	justify-content: space-between;
+}
+
+footer nav div {
+	gap: 17.5px;
+	display: flex;
+	align-items: center;
+}
+
+footer nav a, footer a:visited {
+	display: flex;
+	align-items: center;
+}
+
+footer nav a svg {
+	color: #31bafe;
+}
+footer nav div a svg {
+	color: #ffffff;
+}
+
+footer nav div p {
+	font-size: 12px;
+}

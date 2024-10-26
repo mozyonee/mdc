@@ -1,0 +1,30 @@
+header {
+	background: #303030;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	color: #fff;
+}
+
+header nav {
+	width: 100%;
+	padding: 0 20px;
+	display: flex;
+	text-align: center;
+	align-items: center;
+	justify-content: space-between;
+}
+header nav div {
+	gap: 12.5px;
+	display: flex;
+	align-items: center;
+}
+
+header a, header a:visited {
+	display: flex;
+	align-items: center;
+}
+
+header a svg {
+	color: #ffffff;
+}

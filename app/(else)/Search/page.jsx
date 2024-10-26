@@ -316,7 +316,7 @@ const Search = () => {
 							</tr>
 						</thead>
 						<tbody>
-							{result.tickets.map(ticket => <tr><td>{(new Date(ticket.date * 1000)).toLocaleDateString()}</td><td>{ticket.officer}</td><td>{ticket.reason}</td><td>${ticket.price}</td><td><form onSubmit={onRemoveTicket}><input type="hidden" name="id" value={ticket.id} /><button type="submit" disabled={isLoading}>{isLoading ? '...' : (<AiOutlineClose size={20} />)}</button></form></td></tr>)}
+							{result.tickets.map(ticket => <tr key={ticket.id}><td>{(new Date(ticket.date * 1000)).toLocaleDateString()}</td><td>{ticket.officer}</td><td>{ticket.reason}</td><td>${ticket.price}</td><td><form onSubmit={onRemoveTicket}><input type="hidden" name="id" value={ticket.id} /><button type="submit" disabled={isLoading}>{isLoading ? '...' : (<AiOutlineClose size={20} />)}</button></form></td></tr>)}
 						</tbody>
 					</table>
 				) : (

@@ -290,7 +290,7 @@ const Search = () => {
 							</tr>
 						</thead>
 						<tbody>
-							{result.wanted.map(want => <tr><td>{(new Date(want.date * 1000)).toLocaleDateString()}</td><td>{want.officer}</td><td>{want.reason}</td><td>{want.jail} years</td><td><form onSubmit={onRemoveWanted}><input type="hidden" name="id" value={want.id} /><button type="submit" disabled={isLoading}>{isLoading ? '...' : (<AiOutlineClose size={20} />)}</button></form></td></tr>)}
+							{result.wanted.map(want => <tr key={want.id}><td>{(new Date(want.date * 1000)).toLocaleDateString()}</td><td>{want.officer}</td><td>{want.reason}</td><td>{want.jail} years</td><td><form onSubmit={onRemoveWanted}><input type="hidden" name="id" value={want.id} /><button type="submit" disabled={isLoading}>{isLoading ? '...' : (<AiOutlineClose size={20} />)}</button></form></td></tr>)}
 						</tbody>
 					</table>
 				) : (

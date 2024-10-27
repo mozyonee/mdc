@@ -46,13 +46,6 @@ export const options = {
 
                     [user, account, faction, factionRank, tickets] = [user[0], account[0], faction[0], factionRank[0], tickets[0]];
 
-                    // if (!user) throw new Error("User not found");
-                    // if (!account) throw new Error("Account not found");
-                    // if (!faction) throw new Error("Faction not found");
-                    // if (!factionRank) throw new Error("Faction rank not found");
-
-                    if(!(1 <= faction.Type <= 3)) return null;
-
                     const resultUser = {
                         ...user,
                         pID: account.pID,
@@ -61,6 +54,15 @@ export const options = {
                         rank: factionRank.Name,
                         fines: tickets.count,
                     };
+
+                    console.log(resultUser);
+
+                    if (!user) throw new Error("User not found");
+                    if (!account) throw new Error("Account not found");
+                    if (!faction) throw new Error("Faction not found");
+                    if (!factionRank) throw new Error("Faction rank not found");
+
+                    if(!(1 <= faction.Type <= 3)) return null;
 
                     return resultUser;
             

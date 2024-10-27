@@ -24,7 +24,7 @@ export const options = {
                 password: {
                     label: "Password:",
                     type: "password",
-                    placeholder: "For example, 123456"
+                    placeholder: "For example, 123123"
                 }
             },
             async authorize(credentials) {

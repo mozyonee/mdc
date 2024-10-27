@@ -1,13 +1,10 @@
 import { withAuth } from "next-auth/middleware";
 
 export default withAuth(
-	function middleware(req) {
-	},
+	middleware = (req) => { },
 	{
-		callbacks: {
-			authorized: ({token}) => !!token,
-		},
-		secret: process.env.NEXTAUTH_Secret,
+		callbacks: { authorized: ({token}) => !!token },
+		secret: process.env.NEXTAUTH_SECRET,
 	}
 );
 

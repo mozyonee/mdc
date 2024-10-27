@@ -1,12 +1,7 @@
 import CredentialsProvider from "next-auth/providers/credentials";
-import util from "util";
-import db from "../../../../util/db";
+import { query } from "../../../../util/db";
 import crypto from "crypto";
 
-// Promisify the query function from the database utility
-const query = util.promisify(db.query).bind(db);
-
-// Function to hash the password using SHA-256
 const sha256Hash = (password, salt) => {
     const hash = crypto.createHash('sha256');
     hash.update(password + salt);
@@ -35,74 +30,50 @@ export const options = {
             async authorize(credentials) {
                 if (!credentials?.name || !credentials?.password) {
                     console.log("ERROR: Missing credentials");
-                    return null; // Early return for missing credentials
+                    return null;
                 }
-
+            
                 const hashedPassword = sha256Hash(credentials.password, "jobiden");
-
+            
                 try {
-                    // Use a transaction or handle each query's return carefully
-                    const user = await query(
-                        `SELECT * FROM characters WHERE Name = ? LIMIT 1`,
-                        [credentials.name]
-                    );
+                    let [user, account, faction, factionRank, tickets] = await Promise.all([
+                        query(`SELECT * FROM characters WHERE Name = ? LIMIT 1`, [credentials.name]),
+                        query(`SELECT pID FROM accounts WHERE pName = (SELECT cOwner FROM characters WHERE Name = ? LIMIT 1) AND pPassword = ? LIMIT 1`, [credentials.name, hashedPassword]),
+                        query(`SELECT * FROM factions WHERE ID = (SELECT pMember FROM characters WHERE Name = ? LIMIT 1) LIMIT 1`, [credentials.name]),
+                        query(`SELECT Name FROM faction_ranks WHERE Faction = (SELECT pMember FROM characters WHERE Name = ? LIMIT 1) AND fID = (SELECT pRank FROM characters WHERE Name = ? LIMIT 1) LIMIT 1`, [credentials.name, credentials.name]),
+                        query(`SELECT count(*) as count FROM tickets WHERE officer = (SELECT Name FROM characters WHERE Name = ? LIMIT 1)`, [credentials.name])
+                    ]);
 
-                    if (!user.length) throw new Error("User not found");
+                    [user, account, faction, factionRank, tickets] = [user[0], account[0], faction[0], factionRank[0], tickets[0]];
 
-                    const account = await query(
-                        `SELECT pID FROM accounts WHERE pName = ? AND pPassword = ? LIMIT 1`,
-                        [user[0].cOwner, hashedPassword]
-                    );
+                    if (!user) throw new Error("User not found");
+                    if (!account) throw new Error("Account not found");
+                    if (!faction) throw new Error("Faction not found");
+                    if (!factionRank) throw new Error("Faction rank not found");
 
-                    if (!account.length) throw new Error("Account not found");
+                    if(!(1 <= faction.Type <= 3)) return null;
 
-                    const faction = await query(
-                        `SELECT * FROM factions WHERE ID = ? LIMIT 1`,
-                        [user[0].pMember]
-                    );
-
-                    if (!faction.length) throw new Error("Faction not found");
-
-                    const factionRank = await query(
-                        `SELECT Name FROM faction_ranks WHERE Faction = ? AND fID = ? LIMIT 1`,
-                        [user[0].pMember, user[0].pRank]
-                    );
-
-                    if (!factionRank.length) throw new Error("Faction rank not found");
-
-                    const tickets = await query(
-                        `SELECT count(*) as count FROM tickets WHERE officer = ? LIMIT 1`,
-                        [user[0].cName]
-                    );
-
-                    // Log the successful retrieval of user data
-                    console.log("SUCCESS", { user: user[0], account, faction: faction[0], factionRank: factionRank[0], tickets: tickets[0] });
-
-                    // Perform additional checks on faction type
-                    if (faction[0].Type < 1 || faction[0].Type > 3) return null;
-
-                    // Assign role and additional user properties
                     const resultUser = {
-                        ...user[0],
-                        role: user[0].pRank >= faction[0].sRank ? "Supervisor" : "Officer",
-                        faction: faction[0].Name,
-                        rank: factionRank[0].Name,
-                        fines: tickets[0].count,
+                        ...user,
+                        pID: account.pID,
+                        role: user.pRank >= faction.sRank ? "Supervisor" : "Officer",
+                        faction: faction.Name,
+                        rank: factionRank.Name,
+                        fines: tickets.count,
                     };
 
                     return resultUser;
-
+            
                 } catch (error) {
                     console.log("ERROR:", error.message);
-                    return null; // Return null on any error
+                    return null;
                 }
-            }
+            }            
         })
     ],
     callbacks: {
         async jwt({ token, user }) {
             if (user) {
-                // Store additional user properties in the token
                 token.duty = user.FracDuty;
                 token.skin = user.pFracSkin;
                 token.name = user.Name;
@@ -116,7 +87,6 @@ export const options = {
         },
         async session({ session, token }) {
             if (session?.user) {
-                // Assign additional token properties to the session user
                 session.user.duty = token.duty;
                 session.user.skin = token.skin;
                 session.user.name = token.name;
@@ -129,5 +99,5 @@ export const options = {
             return session;
         }
     },
-    secret: process.env.NEXTAUTH_SECRET // Use the environment variable for the secret
+    secret: process.env.NEXTAUTH_SECRET
 };

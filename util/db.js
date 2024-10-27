@@ -1,7 +1,8 @@
+// util/db.js
 import mysql from "mysql2/promise";
 
 const pool = mysql.createPool({
-    connectionLimit: 10,
+    connectionLimit: 20,
     host: "mysql-374c1fbb-mdc-rp.h.aivencloud.com",
     database: "defaultdb",
     user: "avnadmin",
@@ -10,23 +11,17 @@ const pool = mysql.createPool({
     connectTimeout: 10000
 });
 
-// Function to test connection
-const testConnection = async () => {
-    try {
-        const connection = await pool.getConnection();
-        console.log("Database connection successful");
-        connection.release(); // Release the connection back to the pool
-    } catch (error) {
-        console.error("Error connecting to the database:", error.message);
-    }
-};
-
-// Call the test connection function
-testConnection();
-
 export const query = async (sql, params) => {
-    const [rows] = await pool.query(sql, params);
-    return rows;
+    const connection = await pool.getConnection();
+    try {
+        const [rows] = await connection.query(sql, params);
+        return rows; // Return rows from the query
+    } catch (error) {
+        console.error("Database query error:", error);
+        throw error; // Rethrow error after logging
+    } finally {
+        connection.release(); // Always release connection back to pool
+    }
 };
 
 export default pool;

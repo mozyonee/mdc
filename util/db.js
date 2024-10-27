@@ -6,7 +6,8 @@ const pool = mysql.createPool({
     database: "defaultdb",
     user: "avnadmin",
     password: "AVNS_biDYk7NR2j9gi7NNTG1",
-    port: 14756
+    port: 14756,
+    connectTimeout: 10000
 });
 
 // Function to test connection

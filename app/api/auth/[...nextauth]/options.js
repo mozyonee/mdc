@@ -44,6 +44,8 @@ export const options = {
                         query(`SELECT count(*) as count FROM tickets WHERE officer = (SELECT Name FROM characters WHERE Name = ? LIMIT 1)`, [credentials.name])
                     ]);
 
+                    console.log(account);
+
                     [user, account, faction, factionRank, tickets] = [user[0], account[0], faction[0], factionRank[0], tickets[0]];
 
                     const resultUser = {

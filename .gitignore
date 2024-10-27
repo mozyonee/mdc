@@ -16,6 +16,8 @@
 # production
 /build
 
+/app/(archive)
+
 # misc
 .DS_Store
 *.pem

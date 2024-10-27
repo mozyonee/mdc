@@ -2,6 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
+import { Suspense } from "react";
 
 const Member = () => {
 	const {data: session} = useSession({
@@ -10,11 +11,13 @@ const Member = () => {
 			redirect("/api/auth/signin?callbackUrl=/ClientMember");
 		}
 	});
-	return (<div>
-		<h1>Member Client Session</h1>
-		<p>{session?.user?.email}</p>
-		<p>{session?.user?.role}</p>
-	</div>);
+	return (<Suspense fallback={<>Loading...</>}>
+		<div>
+			<h1>Member Client Session</h1>
+			<p>{session?.user?.email}</p>
+			<p>{session?.user?.role}</p>
+		</div>
+	</Suspense>);
 }
 
 export default Member;

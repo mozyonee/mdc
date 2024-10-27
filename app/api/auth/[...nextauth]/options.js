@@ -19,17 +19,17 @@ export const options = {
     },
     providers: [
         CredentialsProvider({
-            name: "Credentials",
+            name: "credentials",
             credentials: {
                 name: {
                     label: "Name:",
                     type: "text",
-                    placeholder: "Your name"
+                    placeholder: "For example, Jacob_Gerkens"
                 },
                 password: {
                     label: "Password:",
                     type: "password",
-                    placeholder: "Your password"
+                    placeholder: "For example, 123456"
                 }
             },
             async authorize(credentials) {

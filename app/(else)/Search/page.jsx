@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { AiOutlineClose } from "react-icons/ai";
 import Image from 'next/image';
 import "./page.css";
+import { redirect } from "next/navigation";
 
 const Search = () => {
 	const ethnoses = ["Latino", "White", "Asian", "Black"];
@@ -40,12 +41,11 @@ const Search = () => {
 			});
 
 			let data = (await response.json());
-
+			console.log(data.message);
 			if(!response.ok) {
 				throw new Error(data.error);
 			} else setResult(data.message);
 		} catch (error) {
-			console.error(error);
 			setError(error.message);
 		} finally {
 			setIsLoading(false);
@@ -232,21 +232,23 @@ const Search = () => {
 		{result && (<div className="result">
 			<div className="profile">
 				{result.searched === "person" && (<>
-					<img src={`/skin/${result.cSkin}.png`} alt={result.cSkin} height={250} />
+					<Image src={`/skin/${result.cSkin}.png`} alt={result.cSkin} width={115} height={285} />
 					<ul>
 						<li>Name: {result.Name.replace(/_/g, ' ')}.</li>
 						<li>Sex: {result.cSex ? "Female" : "Male"}.</li>
 						<li>Ethnos: {ethnoses[result.cEthnos]}.</li>
 						<li>Age: {result.cAge}.</li>
 						<li>Residence: {result.house ? result.house : "None"}.</li>
-						<li>Vehicles: {result.vehicle.map((veh, key) => (key !== 0 ? `, ${veh.number}` : veh.number)).join('')}.</li>
+						{result.vehicle && (
+							<li>Vehicles: {result.vehicle.map((veh, key) => (key !== 0 ? `, ${veh.number}` : veh.number)).join('')}.</li>
+						)}
 						<li>Licenses: {result.TLicCar && ("Driver's;")} {result.TLicAir && ("Pilot's;")} {result.TLicBoat && ("Skipper's;")} {result.TLicWeapon && ("Weapon.")}</li>
 						
 					</ul>
 				</>)}
 				
 				{result.searched === "vehicle" && (<>
-					<img src={`/vehicle/${result.model}.png`} alt={result.model} height={108} />
+					<Image src={`/vehicle/${result.model}.png`} alt={result.model} width={285} height={115} />
 					<ul>
 						<li>Owner: {result.owner.replace(/_/g, ' ')}.</li>
 						<li>Model: {vehicles[result.model-400]}.</li>
@@ -276,7 +278,7 @@ const Search = () => {
 				</>)}
 			</div>
 			<div className="police">
-				{result.wanted.length !== 0 ? (
+				{result.wanted ? (
 					<table>
 						<caption>
 							Wanted:
@@ -290,7 +292,7 @@ const Search = () => {
 							</tr>
 						</thead>
 						<tbody>
-							{result.wanted.map(want => <tr key={want.id}><td>{(new Date(want.date * 1000)).toLocaleDateString()}</td><td>{want.officer}</td><td>{want.reason}</td><td>{want.jail} years</td><td><form onSubmit={onRemoveWanted}><input type="hidden" name="id" value={want.id} /><button type="submit" disabled={isLoading}>{isLoading ? '...' : (<AiOutlineClose size={20} />)}</button></form></td></tr>)}
+							{result.wanted.map(want => <tr key={want.id}><td>{(new Date(want.date * 1000)).toLocaleDateString()}</td><td>{want.officer.replace(/_/g, ' ')}</td><td>{want.reason}</td><td>{want.jail} years</td><td><form onSubmit={onRemoveWanted}><input type="hidden" name="id" value={want.id} /><button type="submit" disabled={isLoading}>{isLoading ? '...' : (<AiOutlineClose size={20} />)}</button></form></td></tr>)}
 						</tbody>
 					</table>
 				) : (
@@ -302,7 +304,7 @@ const Search = () => {
 					<button type="submit" disabled={isLoading}>{isLoading ? 'Loading...' : 'Add'}</button>
 				</form>
 				
-				{result.tickets.length !== 0 ? (
+				{result.tickets ? (
 					<table>
 						<caption>
 							Fines:
@@ -316,7 +318,7 @@ const Search = () => {
 							</tr>
 						</thead>
 						<tbody>
-							{result.tickets.map(ticket => <tr key={ticket.id}><td>{(new Date(ticket.date * 1000)).toLocaleDateString()}</td><td>{ticket.officer}</td><td>{ticket.reason}</td><td>${ticket.price}</td><td><form onSubmit={onRemoveTicket}><input type="hidden" name="id" value={ticket.id} /><button type="submit" disabled={isLoading}>{isLoading ? '...' : (<AiOutlineClose size={20} />)}</button></form></td></tr>)}
+							{result.tickets.map(ticket => <tr key={ticket.id}><td>{(new Date(ticket.date * 1000)).toLocaleDateString()}</td><td>{ticket.officer.replace(/_/g, ' ')}</td><td>{ticket.reason}</td><td>${ticket.price}</td><td><form onSubmit={onRemoveTicket}><input type="hidden" name="id" value={ticket.id} /><button type="submit" disabled={isLoading}>{isLoading ? '...' : (<AiOutlineClose size={20} />)}</button></form></td></tr>)}
 						</tbody>
 					</table>
 				) : (

@@ -1,6 +1,6 @@
 "use client"
 
-import {useState} from 'react';
+import { useState } from 'react';
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -30,13 +30,12 @@ const Office = () => {
 				if(!response.ok) {
 					throw new Error(data.error);
 				} else setResult(data.message);
-				console.log(data.message);
 			} catch (error) {
-				console.error(error);
+				console.log(error);
 			} finally {
 				console.log('done');
 			}
-		}
+		} 
 	};
 	
 
@@ -62,44 +61,60 @@ const Office = () => {
 				<p>Bolos: {session?.user?.fines}.</p>
 			</div>
 		</div>)}
-		{page === 'roster' && result && (<div className="calls">
-			
-			<table>
-				<tr>
-					<th>Name</th>
-				</tr>
-				{result.map((res)=>{
-					return (<tr key={res.cID}>
-						<td>{res.Name?.replace(/_/g, ' ')}</td>
-					</tr>)
-				})}
-			</table>
-			
-		</div>)}
-		{page === 'calls' && result && (<div className="calls">
-			
-			<table>
-				<tr>
-					<th>#</th>
-					<th>Time</th>
-					<th>Name</th>
-					<th>Description</th>
-					<th>Place</th>
-					<th>Location</th>
-				</tr>
-				{result.map((res)=>{
-					return (<tr key={res.ID}>
-						<td>{res.ID}</td>
-						<td>{res.Time}</td>
-						<td>{res.Name?.replace(/_/g, ' ')}</td>
-						<td>{res.Description}</td>
-						<td>{res.Place}</td>
-						<td>{res.X}, {res.Y}, {res.Z}</td>
-					</tr>)
-				})}
-			</table>
-			
-		</div>)}
+		{page === 'roster' && result && (
+			<div className="calls">
+				<table>
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>Rank</th>
+						</tr>
+					</thead>
+					<tbody>
+						{result.map((res) => (
+							<tr key={res.cID}>
+								<td>{res.Name?.replace(/_/g, ' ')}</td>
+								<td>{res.Rank}</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+		)}
+
+		{page === 'calls' && result && (
+			<div className="calls">
+				<table>
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Time</th>
+							<th>Name</th>
+							<th>Description</th>
+							<th>Place</th>
+							<th>Location</th>
+						</tr>
+					</thead>
+					<tbody>
+						{result.map((res, index) => {
+							// Use a combination of ID and index as a fallback key if needed
+							const key = res.ID ? res.ID : `row-${index}`;
+							return (
+								<tr key={key}>
+									<td>{res.ID}</td>
+									<td>{res.Time}</td>
+									<td>{res.Name?.replace(/_/g, ' ')}</td>
+									<td>{res.Description}</td>
+									<td>{res.Place}</td>
+									<td>{res.X}, {res.Y}, {res.Z}</td>
+								</tr>
+							);
+						})}
+					</tbody>
+				</table>
+			</div>
+		)}
+
 	</div>);
 }
 

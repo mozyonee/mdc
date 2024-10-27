@@ -17,11 +17,13 @@ html {
 
 body {
 	min-height: 100%;
-	display: grid;
 	font-weight: 600;
 	font-family: 'Noto Sans';
+	display: flex;
+    flex-direction: column;
 }
 
 main {
+	flex: 1;
 	padding: 20px;
 }

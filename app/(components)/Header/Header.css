@@ -4,6 +4,7 @@ header {
 	align-items: center;
 	justify-content: flex-end;
 	color: #fff;
+	height: 50px;
 }
 
 header nav {

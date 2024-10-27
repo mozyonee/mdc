@@ -1,54 +1,67 @@
 import { NextResponse } from "next/server";
-import util from "util";
-import db from "../../../util/db";
+import db from "../../../util/db"; // Adjust the path as necessary
 
-const query = util.promisify(db.query).bind(db);
+const handler = async (req) => {
+    const data = await req.json();
 
-const handler = async (req, response) => {
-	const data = await req.json();
-	try {
-		switch(data.target) {
-			case "person": {
-				response = (await query(`SELECT cID, Name, cAge, cSex, cEthnos, cSkin, TLicCar, TLicAir, TLicBoat, TLicWeapon, house FROM characters WHERE Name = '${data.filter}' LIMIT 1`))[0];
-				response.tickets = await query(`SELECT * FROM tickets WHERE fined = '${response.cID}'`);
-				response.wanted = await query(`SELECT * FROM wanted WHERE wanted = '${response.cID}'`);
-				response.vehicle = await query(`SELECT number FROM cars WHERE owner = '${response.Name}'`);
-				break;
-			}
-			case "vehicle": {
-				response = (await query(`SELECT id, owner, model, number, color_one, color_two FROM cars WHERE number = '${data.filter}' LIMIT 1`))[0];
-				response.tickets = await query(`SELECT * FROM tickets WHERE fined = '${response.id}'`);
-				response.wanted = await query(`SELECT * FROM wanted WHERE wanted = '${response.id}'`);
-				break;
-			}
-			case "house": {
-				response = (await query(`SELECT id, ownerid, price, x, y, z FROM houses WHERE ID = '${data.filter}' LIMIT 1`))[0];
-				let ownername = (await query(`SELECT Name FROM characters WHERE cID = '${response.ownerid}' LIMIT 1`))[0];
-				if(ownername) response.owner = ownername.Name;
-				response.tickets = await query(`SELECT * FROM tickets WHERE fined = '${response.id}'`);
-				response.wanted = await query(`SELECT * FROM wanted WHERE wanted = '${response.id}'`);
+    try {
+        let response;
 
-				break;
-			}
-			case "business": {
-				response = (await query(`SELECT ID, Owner, Name, Type, Price, X, Y, Z FROM business_new WHERE ID = '${data.filter}' LIMIT 1`))[0];
-				response.tickets = await query(`SELECT * FROM tickets WHERE fined = '${response.ID}'`);
-				response.wanted = await query(`SELECT * FROM wanted WHERE wanted = '${response.ID}'`);
-				let ownername = (await query(`SELECT Name FROM characters WHERE cID = '${response.Owner}' LIMIT 1`))[0];
-				if(ownername) response.owner = ownername.Name;
-				break;
-			}
-			default: {
-				return NextResponse.json({ error: "Wrong target." }, { status: 400 });
-			}
-		}
-		if(response) {
-			response.searched = data.target;
-			return NextResponse.json({ message: response }, { status: 200 });
-		} else return NextResponse.json({ error: "Not found." }, { status: 404 });
-	} catch(error) {
-		return NextResponse.json({ error: error.message }, { status: 500 });
-	}
+        switch (data.target) {
+            case "person": {
+                response = (await db.query(`SELECT cID, Name, cAge, cSex, cEthnos, cSkin, TLicCar, TLicAir, TLicBoat, TLicWeapon, house FROM characters WHERE Name = ? LIMIT 1`, [data.filter]))[0][0];
+                if (response) {
+                    response.tickets = (await db.query(`SELECT * FROM tickets WHERE fined = ${response.cID}`))[0];
+                    response.wanted = (await db.query(`SELECT * FROM wanted WHERE wanted = ${response.cID}`))[0];
+                    response.vehicle = (await db.query(`SELECT number FROM cars WHERE owner = ?`, [response.Name]))[0];
+                }
+                break;
+            }
+            case "vehicle": {
+                response = (await db.query(`SELECT id, owner, model, number, color_one, color_two FROM cars WHERE number = ? LIMIT 1`, [data.filter]))[0][0];
+                if (response) {
+                    response.tickets = (await db.query(`SELECT * FROM tickets WHERE fined = ?`, [response.id]))[0];
+                    response.wanted = (await db.query(`SELECT * FROM wanted WHERE wanted = ?`, [response.id]))[0];
+                }
+                break;
+            }
+            case "house": {
+                response = (await db.query(`SELECT id, ownerid, price, x, y, z FROM houses WHERE ID = ? LIMIT 1`, [data.filter]))[0][0];
+                if (response) {
+                    const ownername = (await db.query(`SELECT Name FROM characters WHERE cID = ? LIMIT 1`, [response.ownerid]))[0];
+                    if (ownername[0]) response.owner = ownername[0].Name;
+                    response.tickets = (await db.query(`SELECT * FROM tickets WHERE fined = ?`, [response.id]))[0];
+                    response.wanted = (await db.query(`SELECT * FROM wanted WHERE wanted = ?`, [response.id]))[0];
+                }
+                break;
+            }
+            case "business": {
+                response = (await db.query(`SELECT ID, Owner, Name, Type, Price, X, Y, Z FROM business_new WHERE ID = ? LIMIT 1`, [data.filter]))[0][0];
+                if (response) {
+                    response.tickets = (await db.query(`SELECT * FROM tickets WHERE fined = ?`, [response.ID]))[0];
+                    response.wanted = (await db.query(`SELECT * FROM wanted WHERE wanted = ?`, [response.ID]))[0];
+                    const ownername = (await db.query(`SELECT Name FROM characters WHERE cID = ? LIMIT 1`, [response.Owner]))[0];
+                    if (ownername[0]) response.owner = ownername[0].Name;
+                }
+                break;
+            }
+            default: {
+                return NextResponse.json({ error: "Wrong target." }, { status: 400 });
+            }
+        }
+
+        if (response) {
+            response.searched = data.target;
+
+            console.log(response);
+            return NextResponse.json({ message: response }, { status: 200 });
+        } else {
+            return NextResponse.json({ error: "Not found." }, { status: 404 });
+        }
+    } catch (error) {
+        console.error("Error in handler:", error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
 }
 
-export {handler as GET, handler as POST};
+export { handler as GET, handler as POST };

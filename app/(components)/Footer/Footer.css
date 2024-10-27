@@ -3,6 +3,7 @@ footer {
 	display: flex;
 	align-items: center;
 	color: #fff;
+	height: 50px;
 }
 
 footer nav {

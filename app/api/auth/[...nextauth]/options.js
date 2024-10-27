@@ -36,17 +36,18 @@ export const options = {
                 const hashedPassword = sha256Hash(credentials.password, "jobiden");
             
                 try {
-                    let [user, account, faction, factionRank, tickets] = await Promise.all([
+                    let [user, account, faction, factionRank, tickets, bolos] = await Promise.all([
                         query(`SELECT * FROM characters WHERE Name = ? LIMIT 1`, [credentials.name]),
                         query(`SELECT pID FROM accounts WHERE pName = (SELECT cOwner FROM characters WHERE Name = ? LIMIT 1) AND pPassword = ? LIMIT 1`, [credentials.name, hashedPassword]),
                         query(`SELECT * FROM factions WHERE ID = (SELECT pMember FROM characters WHERE Name = ? LIMIT 1) LIMIT 1`, [credentials.name]),
                         query(`SELECT Name FROM faction_ranks WHERE Faction = (SELECT pMember FROM characters WHERE Name = ? LIMIT 1) AND fID = (SELECT pRank FROM characters WHERE Name = ? LIMIT 1) LIMIT 1`, [credentials.name, credentials.name]),
-                        query(`SELECT count(*) as count FROM tickets WHERE officer = (SELECT Name FROM characters WHERE Name = ? LIMIT 1)`, [credentials.name])
+                        query(`SELECT count(*) as count FROM tickets WHERE officer = ?`, [credentials.name]),
+                        query(`SELECT count(*) as count FROM wanted WHERE officer = ?`, [credentials.name])
                     ]);
 
                     console.log(`SELECT pID FROM accounts WHERE pName = (SELECT cOwner FROM characters WHERE Name = ${credentials.name} LIMIT 1) AND pPassword = ${hashedPassword} LIMIT 1;`);
 
-                    [user, account, faction, factionRank, tickets] = [user[0], account[0], faction[0], factionRank[0], tickets[0]];
+                    [user, account, faction, factionRank, tickets, bolos] = [user[0], account[0], faction[0], factionRank[0], tickets[0], bolos[0]];
 
                     const resultUser = {
                         ...user,
@@ -55,9 +56,8 @@ export const options = {
                         faction: faction.Name,
                         rank: factionRank.Name,
                         fines: tickets.count,
+                        bolos: bolos.count
                     };
-
-                    console.log(resultUser);
 
                     if (!user) throw new Error("User not found");
                     if (!account) throw new Error("Account not found");
@@ -83,6 +83,7 @@ export const options = {
                 token.name = user.Name;
                 token.age = user.cAge;
                 token.fines = user.fines;
+                token.bolos = user.bolos;
                 token.faction = user.faction;
                 token.rank = user.rank;
                 token.role = user.role;
@@ -96,6 +97,7 @@ export const options = {
                 session.user.name = token.name;
                 session.user.age = token.age;
                 session.user.fines = token.fines;
+                session.user.bolos = token.bolos;
                 session.user.rank = token.rank;
                 session.user.faction = token.faction;
                 session.user.role = token.role;

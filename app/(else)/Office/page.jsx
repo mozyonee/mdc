@@ -55,9 +55,9 @@ const Office = () => {
 				<p>Division: Gang and Narcotics Division.</p>
 				<hr></hr>
 				<p>Status: {session?.user?.duty ? ("On duty") : "Off duty"}.</p>
-				<p>Calls: {session?.user?.fines + 2}.</p>
+				<p>Calls: {session?.user?.fines + 3}.</p>
 				<p>Fines: {session?.user?.fines}.</p>
-				<p>Bolos: {session?.user?.fines + 1}.</p>
+				<p>Bolos: {session?.user?.bolos}.</p>
 			</div>
 		</div>)}
 		{page === 'roster' && result && (

@@ -35,9 +35,8 @@ const Office = () => {
 			} finally {
 				console.log('done');
 			}
-		} 
+		}
 	};
-	
 
 	return (<div className="office">
 		<nav className="sideBar">

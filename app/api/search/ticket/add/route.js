@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import util from "util";
 import db from "../../../../../util/db";
 
-const query = util.promisify(db.query).bind(db);
 
 const handler = async (req, response) => {
 	const data = await req.json();
@@ -15,11 +13,9 @@ const handler = async (req, response) => {
 			case "business": type = 3; break;
 		}
 		
-		await query(`INSERT INTO tickets(type, fined, officer, reason, price, date) VALUES ('${type}', '${data.fined}', '${data.officer}', '${data.reason}', '${data.price}', '${data.date}')`);
+		await db.query(`INSERT INTO tickets(type, fined, officer, reason, price, date) VALUES ('${type}', '${data.fined}', '${data.officer}', '${data.reason}', '${data.price}', '${data.date}')`);
 		
-		response = (await query(`SELECT * FROM tickets WHERE fined = '${data.fined}'`));
-
-		console.log(response);
+		response = (await db.query(`SELECT * FROM tickets WHERE fined = '${data.fined}'`))[0];
 
 		if(response) return NextResponse.json({ message: response }, { status: 200 });
 		else return NextResponse.json({ error: "Not found." }, { status: 404 });

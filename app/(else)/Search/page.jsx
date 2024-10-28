@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from "next/navigation";
 import { AiOutlineClose } from "react-icons/ai";
@@ -24,6 +24,10 @@ const Search = () => {
 			redirect("/api/auth/signin?callbackUrl=/Search");
 		}
 	});
+
+	useEffect(() => {
+		result && console.log(result.tickets, result.wanted);
+	}, [result]);
 
 	const submitForm = async (event) => {
 		event.preventDefault()
@@ -234,7 +238,7 @@ const Search = () => {
 				{result.searched === "person" && (<>
 					<Image src={`/skin/${result.cSkin}.png`} alt={result.cSkin} width={115} height={285} />
 					<ul>
-						<li>Name: {result.Name.replace(/_/g, ' ')}.</li>
+						<li>Name: {result.Name?.replace(/_/g, ' ')}.</li>
 						<li>Sex: {result.cSex ? "Female" : "Male"}.</li>
 						<li>Ethnos: {ethnoses[result.cEthnos]}.</li>
 						<li>Age: {result.cAge}.</li>
@@ -292,7 +296,20 @@ const Search = () => {
 							</tr>
 						</thead>
 						<tbody>
-							{result.wanted.map(want => <tr key={want.id}><td>{(new Date(want.date * 1000)).toLocaleDateString()}</td><td>{want.officer.replace(/_/g, ' ')}</td><td>{want.reason}</td><td>{want.jail} years</td><td><form onSubmit={onRemoveWanted}><input type="hidden" name="id" value={want.id} /><button type="submit" disabled={isLoading}>{isLoading ? '...' : (<AiOutlineClose size={20} />)}</button></form></td></tr>)}
+							{result.wanted.map((want, index) => (
+								<tr key={index}>
+									<td>{(new Date(want.date * 1000)).toLocaleDateString()}</td>
+									<td>{want.officer?.replace(/_/g, ' ')}</td>
+									<td>{want.reason}</td>
+									<td>{want.jail} years</td>
+									<td>
+										<form onSubmit={onRemoveWanted}>
+											<input type="hidden" name="id" value={want.id} />
+											<button type="submit" disabled={isLoading}>{isLoading ? '...' : (<AiOutlineClose size={20} />)}</button>
+										</form>
+									</td>
+								</tr>
+							))}
 						</tbody>
 					</table>
 				) : (
@@ -318,7 +335,22 @@ const Search = () => {
 							</tr>
 						</thead>
 						<tbody>
-							{result.tickets.map(ticket => <tr key={ticket.id}><td>{(new Date(ticket.date * 1000)).toLocaleDateString()}</td><td>{ticket.officer.replace(/_/g, ' ')}</td><td>{ticket.reason}</td><td>${ticket.price}</td><td><form onSubmit={onRemoveTicket}><input type="hidden" name="id" value={ticket.id} /><button type="submit" disabled={isLoading}>{isLoading ? '...' : (<AiOutlineClose size={20} />)}</button></form></td></tr>)}
+							{result.tickets.map((ticket, index) => (
+								<tr key={index}>
+									<td>{(new Date(ticket.date * 1000)).toLocaleDateString()}</td>
+									<td>{ticket.officer.replace(/_/g, ' ')}</td>
+									<td>{ticket.reason}</td>
+									<td>${ticket.price}</td>
+									<td>
+										<form onSubmit={onRemoveTicket}>
+											<input type="hidden" name="id" value={ticket.id} />
+											<button type="submit" disabled={isLoading}>
+												{isLoading ? '...' : (<AiOutlineClose size={20} />)}
+											</button>
+										</form>
+									</td>
+								</tr>
+							))}
 						</tbody>
 					</table>
 				) : (

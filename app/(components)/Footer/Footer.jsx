@@ -43,7 +43,7 @@ const Footer = () => {
                 <div>
                     <Link href="/"><SiWindows11 size={20} /></Link>
                     {icons[pathname] && (
-                        <Link href={pathname}>
+                        <Link href="/">
                             {icons[pathname]}
                         </Link>
                     )}

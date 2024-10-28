@@ -282,7 +282,7 @@ const Search = () => {
 				</>)}
 			</div>
 			<div className="police">
-				{result.wanted ? (
+				{result.wanted?.length ? (
 					<table>
 						<caption>
 							Wanted:
@@ -321,7 +321,7 @@ const Search = () => {
 					<button type="submit" disabled={isLoading}>{isLoading ? 'Loading...' : 'Add'}</button>
 				</form>
 				
-				{result.tickets ? (
+				{result.tickets?.length ? (
 					<table>
 						<caption>
 							Fines:

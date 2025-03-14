@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
@@ -18,7 +18,7 @@ const Search = () => {
 	const [error, setError] = useState(null);
 	const [result, setResult] = useState(null);
 
-	const {data: session} = useSession({
+	const { data: session } = useSession({
 		required: true,
 		onUnauthenticated() {
 			redirect("/api/auth/signin?callbackUrl=/Search");
@@ -26,12 +26,12 @@ const Search = () => {
 	});
 
 	useEffect(() => {
-		if(result) console.log("results:", result.tickets, result.wanted);
+		if (result) console.log("results:", result.tickets, result.wanted);
 	}, [result]);
 
 	const submitForm = async (event) => {
-		event.preventDefault()
-	
+		event.preventDefault();
+
 		setIsLoading(true);
 		setError(null);
 		setResult(null);
@@ -41,12 +41,12 @@ const Search = () => {
 
 			const response = await fetch("/api/search", {
 				method: "POST",
-				body: JSON.stringify({ filter: formData.get("filter").replace(/#/g, '').replace(/\s+/g, '_'), target: formData.get("target")})
+				body: JSON.stringify({ filter: formData.get("filter").replace(/#/g, '').replace(/\s+/g, '_'), target: formData.get("target") })
 			});
 
 			let data = (await response.json());
 			console.log("fetched data:", data.message);
-			if(!response.ok) {
+			if (!response.ok) {
 				throw new Error(data.error);
 			} else setResult(data.message);
 		} catch (error) {
@@ -54,18 +54,18 @@ const Search = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}
-	
+	};
+
 	const submitWanted = async (event) => {
-		event.preventDefault()
-	
+		event.preventDefault();
+
 		setIsLoading(true);
 
 		try {
 			const formData = new FormData(event.currentTarget);
 
 			let wantid;
-			switch(result.searched) {
+			switch (result.searched) {
 				case "person": wantid = result.cID; break;
 				case "vehicle": wantid = result.id; break;
 				case "house": wantid = result.id; break;
@@ -86,7 +86,7 @@ const Search = () => {
 
 			let data = (await response.json());
 
-			if(!response.ok) {
+			if (!response.ok) {
 				throw new Error(data.error);
 			} else result.wanted = data.message;
 		} catch (error) {
@@ -94,18 +94,18 @@ const Search = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}
-	
+	};
+
 	const submitTicket = async (event) => {
-		event.preventDefault()
-	
+		event.preventDefault();
+
 		setIsLoading(true);
 
 		try {
 			const formData = new FormData(event.currentTarget);
 
 			let fineid;
-			switch(result.searched) {
+			switch (result.searched) {
 				case "person": fineid = result.cID; break;
 				case "vehicle": fineid = result.id; break;
 				case "house": fineid = result.id; break;
@@ -126,7 +126,7 @@ const Search = () => {
 
 			let data = (await response.json());
 
-			if(!response.ok) {
+			if (!response.ok) {
 				throw new Error(data.error);
 			} else result.tickets = data.message;
 		} catch (error) {
@@ -134,17 +134,17 @@ const Search = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}
+	};
 
 	const onRemoveWanted = async (event) => {
-		event.preventDefault()
+		event.preventDefault();
 		setIsLoading(true);
 
 		try {
 			const formData = new FormData(event.currentTarget);
 
 			let wantid;
-			switch(result.searched) {
+			switch (result.searched) {
 				case "person": wantid = result.cID; break;
 				case "vehicle": wantid = result.id; break;
 				case "house": wantid = result.id; break;
@@ -162,7 +162,7 @@ const Search = () => {
 
 			let data = (await response.json());
 
-			if(!response.ok) {
+			if (!response.ok) {
 				throw new Error(data.error);
 			} else result.wanted = data.message;
 		} catch (error) {
@@ -170,17 +170,17 @@ const Search = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}
+	};
 
 	const onRemoveTicket = async (event) => {
-		event.preventDefault()
+		event.preventDefault();
 		setIsLoading(true);
 
 		try {
 			const formData = new FormData(event.currentTarget);
 
 			let fineid;
-			switch(result.searched) {
+			switch (result.searched) {
 				case "person": fineid = result.cID; break;
 				case "vehicle": fineid = result.id; break;
 				case "house": fineid = result.id; break;
@@ -198,7 +198,7 @@ const Search = () => {
 
 			let data = (await response.json());
 
-			if(!response.ok) {
+			if (!response.ok) {
 				throw new Error(data.error);
 			} else result.tickets = data.message;
 		} catch (error) {
@@ -211,18 +211,24 @@ const Search = () => {
 	const [selectedTarget, setSelectedTarget] = useState("person");
 	const handleSelectChange = (event) => {
 		setSelectedTarget(event.target.value);
+		setInputValue("");
+	};
+
+	const [inputValue, setInputValue] = useState("");
+	const handleInputChange = (event) => {
+		setInputValue(event.target.value);
 	};
 
 	const exampleText = {
-		person: "For example, Brian Randall.",
-		vehicle: "For example, SA149LS.",
-		house: "For example, #58.",
-		business: "For example, #34.",
-	}[selectedTarget]; 
-   
+		person: "Brian Randall.",
+		vehicle: "SA149LS.",
+		house: "#58.",
+		business: "#34.",
+	}[selectedTarget];
+
 	return (<>
 		<form onSubmit={submitForm}>
-			<input name="filter" required={true} />
+			<input name="filter" placeholder={`e.g. ${exampleText}`} onChange={handleInputChange} value={inputValue} required={true} />
 			<select name="target" required={true} onChange={handleSelectChange} value={selectedTarget}>
 				<option value="person">Person</option>
 				<option value="vehicle">Vehicle</option>
@@ -231,7 +237,6 @@ const Search = () => {
 			</select>
 			<button type="submit" disabled={isLoading}>{isLoading ? 'Loading...' : 'Search'}</button>
 		</form>
-		<p>{exampleText}</p>
 		{error && <p style={{ color: 'red' }}>{error}</p>}
 		{result && (<div className="result">
 			<div className="profile">
@@ -247,21 +252,21 @@ const Search = () => {
 							<li>Vehicles: {result.vehicle.map((veh, key) => (key !== 0 ? `, ${veh.number}` : veh.number)).join('')}.</li>
 						)}
 						<li>Licenses: {result.TLicCar && ("Driver's;")} {result.TLicAir && ("Pilot's;")} {result.TLicBoat && ("Skipper's;")} {result.TLicWeapon && ("Weapon.")}</li>
-						
+
 					</ul>
 				</>)}
-				
+
 				{result.searched === "vehicle" && (<>
-					<Image src={`/vehicle/${result.model}.png`} alt={result.model} width={285} height={115} />
+					<Image src={`/vehicle/${result.model}.png`} alt={result.model} width={300} height={115} />
 					<ul>
 						<li>Owner: {result.owner.replace(/_/g, ' ')}.</li>
-						<li>Model: {vehicles[result.model-400]}.</li>
+						<li>Model: {vehicles[result.model - 400]}.</li>
 						<li>Number: {result.number}.</li>
 						<li>Color 1: <span style={{ color: colors[result.color_one] }}>█████</span>.</li>
 						<li>Color 2: <span style={{ color: colors[result.color_two] }}>█████</span>.</li>
 					</ul>
 				</>)}
-				
+
 				{result.searched === "house" && (<>
 					<ul>
 						{result.ownerid ? (<li>Owner: {result.owner.replace(/_/g, ' ')}.</li>) : null}
@@ -320,7 +325,7 @@ const Search = () => {
 					<input type="number" name="jail" placeholder="imprisonment" required={true} min='1' />
 					<button type="submit" disabled={isLoading}>{isLoading ? 'Loading...' : 'Add'}</button>
 				</form>
-				
+
 				{result.tickets?.length ? (
 					<table>
 						<caption>
@@ -364,6 +369,6 @@ const Search = () => {
 			</div>
 		</div>)}
 	</>);
-}
+};
 
 export default Search;

@@ -31,9 +31,9 @@ const Office = () => {
 					throw new Error(data.error);
 				} else setResult(data.message);
 			} catch (error) {
-				console.log(error);
+				console.error("page loading error: ", error);
 			} finally {
-				console.log('done');
+				console.log('page loaded');
 			}
 		}
 	};

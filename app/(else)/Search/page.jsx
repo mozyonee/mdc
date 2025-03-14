@@ -26,7 +26,7 @@ const Search = () => {
 	});
 
 	useEffect(() => {
-		result && console.log(result.tickets, result.wanted);
+		if(result) console.log("results:", result.tickets, result.wanted);
 	}, [result]);
 
 	const submitForm = async (event) => {
@@ -45,7 +45,7 @@ const Search = () => {
 			});
 
 			let data = (await response.json());
-			console.log(data.message);
+			console.log("fetched data:", data.message);
 			if(!response.ok) {
 				throw new Error(data.error);
 			} else setResult(data.message);
@@ -90,7 +90,7 @@ const Search = () => {
 				throw new Error(data.error);
 			} else result.wanted = data.message;
 		} catch (error) {
-			console.error(error);
+			console.error("error:", error);
 		} finally {
 			setIsLoading(false);
 		}
@@ -130,7 +130,7 @@ const Search = () => {
 				throw new Error(data.error);
 			} else result.tickets = data.message;
 		} catch (error) {
-			console.error(error);
+			console.error("error:", error);
 		} finally {
 			setIsLoading(false);
 		}
@@ -166,7 +166,7 @@ const Search = () => {
 				throw new Error(data.error);
 			} else result.wanted = data.message;
 		} catch (error) {
-			console.error(error);
+			console.error("error:", error);
 		} finally {
 			setIsLoading(false);
 		}
@@ -202,7 +202,7 @@ const Search = () => {
 				throw new Error(data.error);
 			} else result.tickets = data.message;
 		} catch (error) {
-			console.error(error);
+			console.error("error:", error);
 		} finally {
 			setIsLoading(false);
 		}

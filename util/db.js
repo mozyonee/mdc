@@ -1,27 +1,25 @@
-// util/db.js
-import mysql from "mysql2/promise";
+import mysql from 'mysql2/promise';
 
 const pool = mysql.createPool({
-	connectionLimit: 20,
 	host: process.env.DB_HOST,
-	database: process.env.DB_DATA,
+	port: process.env.DB_PORT,
 	user: process.env.DB_USER,
 	password: process.env.DB_PASS,
-	port: 3306,
+	database: process.env.DB_NAME,
+	waitForConnections: true,
+	connectionLimit: 10,
+	queueLimit: 0,
 	connectTimeout: 10000
 });
 
-export const query = async (sql, params) => {
-	const connection = await pool.getConnection();
+export async function query(sql, values = []) {
 	try {
-		const [rows] = await connection.query(sql, params);
+		const [rows] = await pool.execute(sql, values);
 		return rows;
 	} catch (error) {
-		console.error("Database query error:", error);
+		console.error('Database query error:', error);
 		throw error;
-	} finally {
-		connection.release();
 	}
-};
+}
 
 export default pool;
